@@ -15,13 +15,13 @@ namespace BulkyBookWeb.Controllers
 
         public IActionResult Index()
         {
-            var objCategoryList =  _db.Categories;
+            var objCategoryList = _db.Categories.ToList();
             return View(objCategoryList);
         }
 
         // GET
         public IActionResult Create()
-        {
+        {            
             return View();
         }
 
@@ -39,14 +39,14 @@ namespace BulkyBookWeb.Controllers
             {
                 _db.Categories.Add(obj);
                 _db.SaveChanges();
-                TempData["success"] = "Category created successfully";
-
+                TempData["success"] = "Category created successfully"; 
+                
                 return RedirectToAction("Index");
             }
 
             return View(obj);
         }
-        
+
         // GET
         public IActionResult Edit(int? id)
         {
@@ -118,7 +118,7 @@ namespace BulkyBookWeb.Controllers
             _db.SaveChanges();
             TempData["success"] = "Category deleted successfully";
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index");            
         }
     }
 }

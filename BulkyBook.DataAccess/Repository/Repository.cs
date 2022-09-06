@@ -25,16 +25,22 @@ namespace BulkyBook.DataAccess.Repository
             dbSet.Add(entity);
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+            query = IncludeProperties(includeProperties, query);
+
             return query.ToList();
         }
 
-        public T GetFirstOrDefault(Expression<Func<T, bool>> filter)
+        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
-            return query.FirstOrDefault(filter);
+            query = query.Where(filter);
+
+            query = IncludeProperties(includeProperties, query);
+
+            return query.FirstOrDefault();
         }
 
         public void Remove(T entity)
@@ -45,6 +51,19 @@ namespace BulkyBook.DataAccess.Repository
         public void RemoveRange(IEnumerable<T> entity)
         {
             dbSet.RemoveRange(entity);
+        }
+
+        private IQueryable<T> IncludeProperties(string? includeProperties, IQueryable<T> query)
+        {
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+
+            return query;
         }
     }
 }

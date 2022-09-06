@@ -49,10 +49,9 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             }
             else
             {
-
+                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == id);
+                return View(productVM);
             }
-
-            return View(productVM);
         }
 
         // POST
@@ -69,67 +68,82 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                     var uploads = Path.Combine(wwwRootPath, @"images\products");
                     var extension = Path.GetExtension(file.FileName);
 
+                    if (obj.Product.ImageUrl != null)
+                    {
+                        DeleteOldFile(obj.Product, wwwRootPath, obj.Product.ImageUrl);
+                    }
+
                     using (var fileStream = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
-                    obj.Product.ImageUrl = @"\images\products" + fileName + extension;
+                    obj.Product.ImageUrl = @"\images\products\" + fileName + extension;
                 }
 
-                _unitOfWork.Product.Add(obj.Product);
-                _unitOfWork.Save();
-                TempData["success"] = "Product created successfully";
+                AddOrUpdateProduct(obj);
+
+                
 
                 return RedirectToAction("Index");
             }
 
             return View(obj);
         }
-
-        // GET
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-
-            var covertTypeFromDb = _unitOfWork.CoverType.GetFirstOrDefault(c => c.Id == id);
-            if (covertTypeFromDb == null)
-            {
-                return NotFound();
-            }
-
-            return View(covertTypeFromDb);
-        }
-
-        // POST
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePOST(int? id)
-        {
-            var obj = _unitOfWork.CoverType.GetFirstOrDefault(c => c.Id == id);
-            if (obj == null)
-            {
-                return NotFound();
-            }
-
-            _unitOfWork.CoverType.Remove(obj);
-            _unitOfWork.Save();
-            TempData["success"] = "CoverType deleted successfully";
-
-            return RedirectToAction("Index");
-        }
-
+                
         #region API Calls
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var productList = _unitOfWork.Product.GetAll();
+            var productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
             return Json(new { data = productList });
         }
 
+        [HttpDelete, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        public IActionResult Delete(int? id)
+        {
+            var obj = _unitOfWork.Product.GetFirstOrDefault(c => c.Id == id);
+            if (obj == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            
+            DeleteOldFile(obj, _hostEnvironment.WebRootPath, obj.ImageUrl);
+
+            _unitOfWork.Product.Remove(obj);
+            _unitOfWork.Save();
+
+            return Json(new { success = true, message = "Product deleted successfully" });
+        }
+
         #endregion
+
+        private void AddOrUpdateProduct(ProductVM obj)
+        {
+            string msg;
+            if (obj.Product.Id == 0)
+            {
+                _unitOfWork.Product.Add(obj.Product);
+                msg = "Product created successfully";
+            }
+            else
+            {
+                _unitOfWork.Product.Update(obj.Product);
+                msg = "Product updated successfully";
+            }
+
+            _unitOfWork.Save();
+            TempData["success"] = msg;
+        }
+
+        private void DeleteOldFile(Product obj, string wwwRootPath, string imageUrl)
+        {
+            var oldImagePath = Path.Combine(wwwRootPath, obj.ImageUrl.TrimStart('\\'));
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+        }
     }
 }

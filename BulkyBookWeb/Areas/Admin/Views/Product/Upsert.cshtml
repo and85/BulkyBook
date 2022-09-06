@@ -21,7 +21,7 @@
         </div>  
         <div class="mb-3">
             <label asp-for="Product.Description"></label>
-            <textarea asp-for="Product.Description" rows="3" class="form-control"></textarea>
+            <textarea id="productDescription" asp-for="Product.Description" rows="3" class="form-control"></textarea>
             <span asp-validation-for="Product.Description" class="text-danger"></span>
         </div> 
         <div class="mb-3 col-6">
@@ -103,8 +103,12 @@
     @{
     <partial name="_ValidationScriptsPartial" />
     }
-
+    
     <script>
+        tinymce.init({
+            selector: '#productDescription'
+          });
+
         function ValidateInput() {
             if (document.getElementById("uploadBox").value === "") {
                 Swal.fire({

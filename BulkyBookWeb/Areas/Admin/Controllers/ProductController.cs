@@ -82,11 +82,9 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
 
                 AddOrUpdateProduct(obj);
 
-                
-
                 return RedirectToAction("Index");
             }
-
+            
             return View(obj);
         }
                 

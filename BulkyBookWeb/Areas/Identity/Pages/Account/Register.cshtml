@@ -4,17 +4,14 @@
 @{
     ViewData["Title"] = "Register";
 }
-@*@if (User.IsInRole(SD.Role_Admin))
+@if (User.IsInRole(SD.Role_Admin))
 {
-
+    
     <h1 class="pt-4">Register - ADMIN PORTAL</h1>
 }
-else
-{
-    <h1 class="pt-4">@ViewData["Title"]</h1>
-}*@
+else{
 <h1 class="pt-4">@ViewData["Title"]</h1>
-
+}
 <div class="row pt-4">
     <div class="col-md-7 ">
         <form id="registerForm" class="row" asp-route-returnUrl="@Model.ReturnUrl" method="post">
@@ -27,11 +24,11 @@ else
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6">
-                <input asp-for="Input.Name" class="form-control" aria-required="true" />
+                <input asp-for="Input.Name" class="form-control"  aria-required="true" />
                 <label asp-for="Input.Name"></label>
                 <span asp-validation-for="Input.Name" class="text-danger"></span>
             </div>
-
+            
             <div class="form-floating py-2 col-6">
                 <input asp-for="Input.PhoneNumber" class="form-control" aria-required="true" />
                 <label asp-for="Input.PhoneNumber"></label>
@@ -48,12 +45,12 @@ else
                 <span asp-validation-for="Input.City" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6">
-                <input asp-for="Input.State" class="form-control" aria-required="true" />
+                <input asp-for="Input.State" class="form-control"  aria-required="true" />
                 <label asp-for="Input.State"></label>
                 <span asp-validation-for="Input.State" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6">
-                <input asp-for="Input.PostalCode" class="form-control" aria-required="true" />
+                <input asp-for="Input.PostalCode" class="form-control"  aria-required="true" />
                 <label asp-for="Input.PostalCode"></label>
                 <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
             </div>
@@ -67,21 +64,20 @@ else
                 <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            @*@if (User.IsInRole(SD.Role_Admin))
-            {*@
-                <div class="form-floating py-2 col-6">
-                    <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class=form-select>
-                        <option disabled selected>-Select Role-</option>
-                    </select>
-
-                </div>
-                <div class="form-floating py-2 col-6">
-                    <select asp-for="Input.CompanyId" style="display:none;" asp-items="@Model.Input.CompanyList" class=form-select>
-                        <option disabled selected>-Select Company-</option>
-                    </select>
-
-                </div>
-            @*}*@
+            @if(User.IsInRole(SD.Role_Admin)){
+            <div class="form-floating py-2 col-6">
+                <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class=form-select>
+                    <option disabled selected>-Select Role-</option>
+                </select>
+                
+            </div>
+            <div class="form-floating py-2 col-6">
+                <select asp-for="Input.CompanyId" style="display:none;" asp-items="@Model.Input.CompanyList" class=form-select>
+                    <option disabled selected>-Select Company-</option>
+                </select>
+                
+            </div>
+            }
             <button id="registerSubmit" type="submit" class="w-100 btn btn-primary">Register</button>
         </form>
     </div>
@@ -96,10 +92,8 @@ else
                     {
                         <div>
                             <p>
-                                There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
-                                    article
-                                    about setting up this ASP.NET application to support logging in via external services
-                                </a>.
+                                There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
+                                    about setting up this ASP.NET application to support logging in via external services</a>.
                             </p>
                         </div>
                     }
@@ -125,13 +119,13 @@ else
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $(document).ready(function() {
-            $('#Input_Role').change(function() {
-                var selection = $('#Input_Role Option:Selected').text();
-                if (selection != 'Company') {
+        $(document).ready(function(){
+            $('#Input_Role').change(function(){
+                var selection= $('#Input_Role Option:Selected').text();
+                if(selection!='Company'){
                     $('#Input_CompanyId').hide();
                 }
-                else {
+                else{
                     $('#Input_CompanyId').show();
                 }
             })

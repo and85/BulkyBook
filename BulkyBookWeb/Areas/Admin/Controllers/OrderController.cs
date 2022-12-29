@@ -113,7 +113,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateOrderDetail()
         {
-            var orderHEaderFromDb = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVM.OrderHeader.Id,tracked:false);
+            var orderHEaderFromDb = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVM.OrderHeader.Id, tracked: false);
             orderHEaderFromDb.Name = OrderVM.OrderHeader.Name;
             orderHEaderFromDb.PhoneNumber = OrderVM.OrderHeader.PhoneNumber;
             orderHEaderFromDb.StreetAddress = OrderVM.OrderHeader.StreetAddress;
@@ -160,7 +160,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                 orderHeader.PaymentDueDate = DateTime.Now.AddDays(30);
             }
             _unitOfWork.OrderHeader.Update(orderHeader);
-             _unitOfWork.Save();
+            _unitOfWork.Save();
             TempData["Success"] = "Order Shipped Successfully.";
             return RedirectToAction("Details", "Order", new { orderId = OrderVM.OrderHeader.Id });
         }
@@ -200,14 +200,15 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         {
             IEnumerable<OrderHeader> orderHeaders;
 
-            if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee)) { 
-            orderHeaders = _unitOfWork.OrderHeader.GetAll(includeProperties: "ApplicationUser");
+            if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
+            {
+                orderHeaders = _unitOfWork.OrderHeader.GetAll(includeProperties: "ApplicationUser");
             }
             else
             {
                 var claimsIdentity = (ClaimsIdentity)User.Identity;
                 var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-                orderHeaders = _unitOfWork.OrderHeader.GetAll(u=>u.ApplicationUserId==claim.Value,includeProperties: "ApplicationUser");
+                orderHeaders = _unitOfWork.OrderHeader.GetAll(u => u.ApplicationUserId == claim.Value, includeProperties: "ApplicationUser");
             }
 
             switch (status)
